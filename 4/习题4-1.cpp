@@ -1,162 +1,178 @@
-#include <stdio.h>
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <algorithm>
-#include <queue>
-#include <string.h>
-#include <set>
-#include <stack>
-#include <stdlib.h>
-#include <time.h>
-
+#include<algorithm>
+#include<cstdio>
+#include<cstring>
+#include<iostream>
+#include<list>
+#include<vector>
 using namespace std;
-//grhc
-
-int dx[] = {-1,0,0,1};
-int dy[] = {0,1,-1,0};
-int tx[20];
-int ty[20];
-int f[20][20] = {};
-
-bool ischeck(int x, int y, int n)
+int checkboard[20][20],bx,by,arr[21][20];
+void general(int i1,int j)
 {
-    for(int i=0;i<n;i++)
+    for(int i = bx;i <= i1;++i)
     {
-        if(tx[i] == x && ty[i] == y)
-            continue;
-        if(f[tx[i]][ty[i]] == 'G' ||
-           f[tx[i]][ty[i]] == 'R')
-        {
-            if(x == tx[i])
-            {
-                int num = 0;
-                for(int j = min(y, ty[i])+1;j<max(y, ty[i]);j++)
-                {
-                    if(f[x][j] != 0)
-                        ++num;
-                }
-                if(num == 0)
-                    return true;
-            }
-            if(y == ty[i])
-            {
-                int num = 0;
-                for(int j = min(x, tx[i])+1;j<max(x, tx[i]);j++)
-                {
-                    if(f[j][y] != 0)
-                        ++num;
-                }
-                if(num == 0)
-                    return true;
-            }
-        }
-        if(f[tx[i]][ty[i]] == 'C')
-        {
-            if(x == tx[i])
-            {
-                int num = 0;
-                for(int j = min(y, ty[i])+1;j<max(y, ty[i]);j++)
-                {
-                    if(f[x][j] != 0)
-                        ++num;
-                }
-                if(num == 1)
-                    return true;
-            }
-            if(y == ty[i])
-            {
-                int num = 0;
-                for(int j = min(x, tx[i])+1;j<max(x, tx[i]);j++)
-                {
-                    if(f[j][y] != 0)
-                        ++num;
-                }
-                if(num == 1)
-                    return true;
-            }
-        }
-        if(f[tx[i]][ty[i]] == 'H')
-        {
-            if(abs(tx[i]-x) == 2 && abs(ty[i]-y) == 1)
-            {
-                if(tx[i] > x && f[tx[i]-1][ty[i]] == 0)
-                    return true;
-                if(tx[i] < x && f[tx[i]+1][ty[i]] == 0)
-                    return true;
-            }
-            if(abs(tx[i]-x) == 1 && abs(ty[i]-y) == 2)
-            {
-                if(ty[i] > y && f[tx[i]][ty[i]-1] == 0)
-                    return true;
-                if(ty[i] < y && f[tx[i]][ty[i]+1] == 0)
-                    return true;
-            }
-        }
+        arr[i][j] = 1;
+        if(checkboard[i][j])
+            break;
     }
-    return false;
 }
-
+void chariot(int i1,int j)
+{
+        for(int i = i1 + 1;i <= 10;++i)
+        {
+            arr[i][j] = 1;
+            if(checkboard[i][j])
+                break;
+        }
+        for(int i = i1 - 1;i >= 0;--i)
+        {
+            arr[i][j] = 1;
+            if(checkboard[i][j])
+                break;
+        }
+        for(int i = j + 1;i <= 9;++i)
+        {
+            arr[i1][i] = 1;
+            if(checkboard[i1][i])
+                break;
+        }
+        for(int i = j - 1;i >= 0;--i)
+        {
+            arr[i1][i] = 1;
+            if(checkboard[i1][i])
+                break;
+        }
+}
+void cannon(int i1,int j)
+{
+        for(int i = i1 + 1;i <= bx;++i)
+            if(checkboard[i][j])
+            {
+                for(int t = i + 1;t <= 10;++t)
+                {
+                    arr[t][j] = 1;
+                    if(checkboard[t][j])
+                        break;
+                }
+                break;
+            }
+        for(int i = i1 -1;i >= bx;--i)
+            if(checkboard[i][j])
+            {
+                for(int t = i - 1;t >= 1;--t)
+                {
+                    arr[t][j] = 1;
+                    if(checkboard[t][j])
+                        break;
+                }
+                break;
+            }
+        for(int i = j + 1;i <= by;++i)
+            if(checkboard[i1][i])
+            {
+                for(int t = i + 1;t <= 9;++t)
+                {
+                    arr[i1][t] = 1;
+                    if(checkboard[i1][t])
+                        break;
+                }
+                break;
+            }
+        for(int i = j - 1;i >= by;--i)
+            if(checkboard[i1][i])
+            {
+                for(int t = i - 1;t >= 1;--t)
+                {
+                    arr[i1][t] = 1;
+                    if(checkboard[i1][t])
+                        break;
+                }
+                break;
+            }
+}
+void horse(int i,int j)
+{
+    if(j < 8 && !checkboard[i][j + 1])
+    {
+        if(i <= 9)
+            arr[i + 1][j + 2] = 1;
+        if(i >= 2)
+            arr[i - 1][j + 2] = 1;
+    }
+    if(j >= 3 && !checkboard[i][j - 1])
+    {
+        if(i <= 9)
+            arr[i + 1][j - 2] = 1;
+        if(i >= 2)
+            arr[i - 1][j - 2] = 1;
+    }
+    if(i <= 8 && !checkboard[i + 1][j])
+    {
+        if(j <= 8)
+            arr[i + 2][j + 1] = 1;
+        if(j >= 2)
+            arr[i + 2][j - 1] = 1;
+    }
+    if(i >= 3 && !checkboard[i - 1][j])
+    {
+        if(j <= 8)
+            arr[i - 2][j + 1] = 1;
+        if(j >= 2)
+            arr[i - 2][j - 1] = 1;
+    }
+}
+void judge()
+{
+    int count1 = bx > 1 ? arr[bx - 1][by] : 1;
+    int count2 = bx < 3 ? arr[bx + 1][by] : 1;
+    int count3 = by < 6 ? arr[bx][by + 1] : 1;
+    int count4 = by > 4 ? arr[bx][by - 1] : 1;
+    //cout << count1 << count2 << count3 << count4;
+    for(int i = bx;i <= 10;++i)
+    {
+        if(checkboard[i][by] == 'G')
+        {
+            printf("NO\n");
+            return;
+        }
+        else if(checkboard[i][by])
+            break;
+    }
+    if(!count1 || !count2 || !count3 || !count4)
+        printf("NO\n");
+    else
+        printf("YES\n");
+}
 int main()
 {
-    int n,x,y;
-    while(cin>>n>>x>>y)
+    int n;
+    while(cin >> n >> bx >> by)
     {
-        if(!n && !x && !y)
+        memset(arr,0,sizeof(arr));
+        memset(checkboard,0,sizeof(checkboard));
+        if(!n && !bx && !by)
             break;
-        memset(f, 0, sizeof(f));
-        int bx=0, by=0;
-        for(int i=0;i<n;i++)
+        while(n)
         {
-            char ch;
-            int a,b;
-            cin>>ch>>a>>b;
-            tx[i] = a;
-            ty[i] = b;
-            f[a][b] = ch;
-            //cout<<"saa"<<f[a][b]<<endl;
-            if(ch == 'G')
-            {
-                bx = a;
-                by = b;
-            }
+            char temp;
+            int x,y;
+            cin >> temp;
+            scanf("%d %d",&x,&y);
+            checkboard[x][y] = temp;
+            --n;
         }
-        bool ff = false;
-        if(y == by)
-        {
-            ff = true;
-            int l = min(bx, x) + 1;
-            int r = max(bx, x);
-            while(l < r)
-            {
-                if(f[l][y] != 0)
+        for(int i = 1;i <= 10;++i)
+            for(int j = 1;j <= 9;++j)
+                if(checkboard[i][j])
                 {
-                    ff = false;
-                    break;
+                    int temp = checkboard[i][j];
+                    switch(temp)
+                    {
+                        case 'C':cannon(i,j);break;
+                        case 'H':horse(i,j);break;
+                        case 'G':case 'R':chariot(i,j);break;
+                    }
                 }
-                ++l;
-            }
-        }
-        if(ff)
-        {
-            cout<<"NO"<<endl;
-            continue;
-        }
-        int i;
-        for(i=0;i<4;i++)
-        {
-            if(x+dx[i]>=1 && x+dx[i]<=3
-               && y+dy[i]>=4 && y+dy[i]<=6)
-            {
-                //cout<<x+dx[i]<<" "<<y+dy[i]<<endl;
-                if(!ischeck(x+dx[i], y+dy[i], n))
-                    break;
-            }
-        }
-        if(i == 4)
-            cout<<"YES"<<endl;
-        else
-            cout<<"NO"<<endl;
+        judge();
     }
     return 0;
 }
