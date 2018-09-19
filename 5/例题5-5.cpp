@@ -1,69 +1,101 @@
-#include <bits/stdc++.h>
+#include <stdio.h>
+#include<vector>
+#include <stdlib.h>
+#include<iostream>
+#include<cstring>
+#include<algorithm>
+#include<string>
+#include<list>
+#include<queue>
+#include<stack>
+#include<map>
+#include<set>
 using namespace std;
-typedef set<int> Set;
-map<Set,int> id;
-vector<Set> vs;
 stack<int> st;
-int ID(const Set &x)
+map<set<int>,int> m;
+set<int> s;
+vector<set<int> > v;
+int n,time1,count1 = 1;
+void id(set<int>& temp2)
 {
-    if(id.find(x)!=id.end())
-        return id[x];
-    vs.push_back(x);
-    return id[x]=vs.size()-1;
-}
-int main ()
-{
-    ios::sync_with_stdio(false);
-    int t,n;
-    cin>>t;
-    while(t--)
+    if(m.find(temp2) != m.end())
+        st.push(m[temp2]);
+    else
     {
-        vs.clear();
-        id.clear();
-        while(!st.empty())
+        m[temp2] = count1;
+        v.push_back(temp2);
+        st.push(count1++);
+    }
+}
+void unio()
+{
+    set<int> temp1 = v[st.top()];
+    st.pop();
+    set<int> temp2 = v[st.top()];
+    st.pop();
+    for(auto pos = temp1.begin();pos != temp1.end();++pos)
+        temp2.insert(*pos);
+    id(temp2);
+}
+void ins()
+{
+    set<int> temp1 = v[st.top()];
+    st.pop();
+    set<int> temp2 = v[st.top()];
+    st.pop();
+    set<int> temp3;
+    for(auto pos = temp1.begin();pos != temp1.end();++pos)
+        if(temp2.find(*pos) != temp2.end())
+            temp3.insert(*pos);
+    id(temp3);
+}
+void add()
+{
+    set<int> temp1 = v[st.top()];
+    st.pop();
+    set<int> temp2 = v[st.top()];
+    st.pop();
+    if(m.find(temp1) != m.end())
+        temp2.insert(m[temp1]);
+    else
+    {
+        m[temp1] = count1;
+        v.push_back(temp1);
+        temp2.insert(count1++);
+    }
+    id(temp2);
+}
+int main()
+{
+    cin >> n;
+    while(n)
+    {
+        cin >> time1;
+        string str;
+        m.clear();
+        v.clear();
+        v.push_back(s);
+        m[s] = 0;
+        count1 = 1;
+        while(st.size())
             st.pop();
-        cin>>n;
-        string s;
-        for(int i=0;i<n;i++)
+        while(time1)
         {
-            cin>>s;
-            if(s=="PUSH")
+            cin >> str;
+            switch(str[0])
             {
-                st.push(ID(Set()));
+                case 'P':st.push(0);break;
+                case 'D':st.push(st.top());break;
+                case 'U':unio();break;
+                case 'I':ins();break;
+                case 'A':add();break;
             }
-            else
-            {
-                if(s=="DUP")
-                {
-                    st.push(st.top());
-                }
-                else
-                {
-                    Set s1=vs[st.top()];
-                    st.pop();
-                    Set s2=vs[st.top()];
-                    st.pop();
-                    Set tmp;
-                    if(s=="UNION")
-                    {
-                        set_union(s1.begin(),s1.end(),s2.begin(),s2.end(),inserter(tmp,tmp.begin()));
-                    }
-                    if(s=="INTERSECT")
-                    {
-                        set_intersection(s1.begin(),s1.end(),s2.begin(),s2.end(),inserter(tmp,tmp.begin()));
-                    }
-                    if(s=="ADD")
-                    {
-                        tmp=s2;
-                        tmp.insert(ID(s1));
-                    }
-                    st.push(ID(tmp));
-                }
-            }
-
-            cout<<vs[st.top()].size()<<endl;
+            set<int> temp1 = v[st.top()];
+            cout << temp1.size() << endl;
+            --time1;
         }
-        cout<<"***"<<endl;
- }
+        cout << "***" << endl;
+        --n;
+    }
     return 0;
 }
